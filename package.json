@@ -1,0 +1,29 @@
+{
+  "name": "obsidian-jira-weaver",
+  "version": "0.1.0",
+  "description": "Sync Jira issues into your Obsidian Vault.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck",
+    "check-i18n": "npx tsx scripts/check-i18n.ts"
+  },
+  "keywords": [
+    "obsidian",
+    "jira",
+    "plugin",
+    "sync",
+    "dataview"
+  ],
+  "author": "Jira Weaver Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.21.0",
+    "obsidian": "latest",
+    "tslib": "^2.6.0",
+    "typescript": "^5.4.0"
+  }
+}
