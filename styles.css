@@ -1,0 +1,56 @@
+/* ── JQL Profile list ─────────────────────────────────────────────────── */
+
+.jira-weaver-profiles {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 12px;
+}
+
+.jira-weaver-profile-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	background: var(--background-secondary);
+}
+
+.jira-weaver-profile-toggle {
+	display: flex;
+	align-items: center;
+}
+
+.jira-weaver-profile-name {
+	flex: 1;
+	font-size: 0.95em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.jira-weaver-profile-add {
+	margin-bottom: 20px;
+}
+
+/* ── Field Mapping header toolbar ────────────────────────────────────── */
+
+.jira-weaver-mapping-header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.jira-weaver-mapping-header h3 {
+	margin: 0;
+	flex: 1;
+	min-width: 120px;
+}
+
+.jira-weaver-mapping-fetched {
+	font-size: 0.85em;
+	color: var(--text-muted);
+	margin-left: 4px;
+}
