@@ -188,16 +188,16 @@ export class JiraClient {
 	}
 
 	private searchDC(params: SearchParams): Promise<JiraSearchResponse> {
-		const body = {
+		const fields = (params.fields ?? DEFAULT_FIELDS).join(",");
+		const qs = new URLSearchParams({
 			jql: params.jql,
-			maxResults: params.maxResults,
-			startAt: params.startAt ?? 0,
-			fields: params.fields ?? DEFAULT_FIELDS,
-		};
+			maxResults: String(params.maxResults),
+			startAt: String(params.startAt ?? 0),
+			fields,
+		});
 		return this.request<JiraSearchResponse>({
-			url: `${this.baseUrl()}/rest/api/2/search`,
-			method: "POST",
-			body: JSON.stringify(body),
+			url: `${this.baseUrl()}/rest/api/2/search?${qs.toString()}`,
+			method: "GET",
 		});
 	}
 
