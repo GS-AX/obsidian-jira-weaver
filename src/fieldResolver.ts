@@ -408,7 +408,12 @@ function serializeScalar(
 }
 
 function yamlString(s: string): string {
-	return `"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+	return `"${s
+		.replace(/\\/g, "\\\\")
+		.replace(/"/g, '\\"')
+		.replace(/\r\n/g, "\\n")
+		.replace(/\n/g, "\\n")
+		.replace(/\r/g, "\\n")}"`;
 }
 
 function isBareYamlTimestamp(s: string): boolean {
