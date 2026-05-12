@@ -162,10 +162,18 @@ export class JiraClient {
 		});
 	}
 
-	/** GET /rest/api/3/search/jql — bulk issue fetch by JQL.
-	 *  Using GET avoids Electron's automatic Origin header that triggers Jira Cloud XSRF checks on POST. */
+	/** Bulk issue fetch by JQL.
+	 *  Cloud (Basic auth): GET /rest/api/3/search/jql — avoids Electron XSRF check on POST.
+	 *  DC/Server (Bearer): POST /rest/api/2/search — v3 endpoint may not exist on older DC. */
 	async searchIssues(params: SearchParams): Promise<JiraSearchResponse> {
 		this.requireConfig();
+		if (this.cfg.authMode === "basic") {
+			return this.searchCloud(params);
+		}
+		return this.searchDC(params);
+	}
+
+	private searchCloud(params: SearchParams): Promise<JiraSearchResponse> {
 		const fields = (params.fields ?? DEFAULT_FIELDS).join(",");
 		const qs = new URLSearchParams({
 			jql: params.jql,
@@ -176,6 +184,20 @@ export class JiraClient {
 		return this.request<JiraSearchResponse>({
 			url: `${this.baseUrl()}/rest/api/3/search/jql?${qs.toString()}`,
 			method: "GET",
+		});
+	}
+
+	private searchDC(params: SearchParams): Promise<JiraSearchResponse> {
+		const body = {
+			jql: params.jql,
+			maxResults: params.maxResults,
+			startAt: params.startAt ?? 0,
+			fields: params.fields ?? DEFAULT_FIELDS,
+		};
+		return this.request<JiraSearchResponse>({
+			url: `${this.baseUrl()}/rest/api/2/search`,
+			method: "POST",
+			body: JSON.stringify(body),
 		});
 	}
 
