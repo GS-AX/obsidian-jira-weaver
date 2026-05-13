@@ -2,7 +2,7 @@ import { Notice, Plugin } from "obsidian";
 
 import { i18n, resolveLocale, t } from "./i18n";
 import { JiraClient, JiraClientError } from "./jiraClient";
-import { FileManager, type IssueSyncResult } from "./fileManager";
+import { FileManager } from "./fileManager";
 import { JiraWeaverSettingTab } from "./settings";
 import { buildRequestedFields } from "./fieldResolver";
 import { SyncScheduler, type SyncOptions } from "./syncScheduler";
@@ -82,25 +82,25 @@ export default class JiraWeaverPlugin extends Plugin {
 
 		this.addCommand({
 			id: "sync-issues",
-			name: "Jira Weaver: Sync Issues",
+			name: "Sync Issues",
 			callback: () => this.runManualSync({ force: false }),
 		});
 
 		this.addCommand({
 			id: "force-sync-issues",
-			name: "Jira Weaver: Force Sync Issues (Overwrite All)",
+			name: "Force Sync Issues (Overwrite All)",
 			callback: () => this.runManualSync({ force: true }),
 		});
 
 		this.addCommand({
 			id: "reload-field-list",
-			name: "Jira Weaver: Reload Field List",
+			name: "Reload Field List",
 			callback: () => this.reloadFieldCatalog(),
 		});
 
 		this.addCommand({
 			id: "open-sync-log",
-			name: "Jira Weaver: Open Sync Log",
+			name: "Open Sync Log",
 			callback: () => this.openSyncLog(),
 		});
 
@@ -169,13 +169,13 @@ export default class JiraWeaverPlugin extends Plugin {
 		const { workspace } = this.app;
 		const leaves = workspace.getLeavesOfType(SYNC_LOG_VIEW_TYPE);
 		if (leaves.length > 0) {
-			workspace.revealLeaf(leaves[0]);
+			void workspace.revealLeaf(leaves[0]);
 			return;
 		}
 		const leaf = workspace.getRightLeaf(false);
 		if (leaf) {
 			await leaf.setViewState({ type: SYNC_LOG_VIEW_TYPE, active: true });
-			workspace.revealLeaf(leaf);
+			void workspace.revealLeaf(leaf);
 		}
 	}
 
@@ -291,7 +291,7 @@ export default class JiraWeaverPlugin extends Plugin {
 
 		for (const issue of search.issues ?? []) {
 			try {
-				const detail: IssueSyncResult = await fm.syncIssue(
+				const detail = await fm.syncIssue(
 					issue as JiraIssue,
 					ctx,
 					{ force: opts.force },

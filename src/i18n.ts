@@ -12,6 +12,7 @@
  * migrated into locales/en.json verbatim.
  */
 
+import { getLanguage } from "obsidian";
 import { SUPPORTED_LOCALES, type LanguageSetting, type SupportedLocale } from "./types";
 
 type Translations = Record<string, string>;
@@ -111,14 +112,14 @@ function interpolate(
 	vars?: Record<string, string | number>,
 ): string {
 	if (!vars) return template;
-	return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, name) => {
+	return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, name: string) => {
 		const v = vars[name];
 		return v === undefined ? match : String(v);
 	});
 }
 
 export const i18n = new I18n();
-export const t = i18n.t.bind(i18n);
+export const t: (key: string, vars?: Record<string, string | number>) => string = i18n.t.bind(i18n);
 
 /* -------------------------------------------------------------------------- */
 /*  Locale resolution (PRD §3.8.3)                                            */
@@ -142,12 +143,7 @@ export function resolveLocale(setting: LanguageSetting): SupportedLocale {
  * normalise to one of the supported locales; unknown values return null.
  */
 function detectAppLocale(): SupportedLocale | null {
-	let raw: string | null = null;
-	try {
-		raw = window.localStorage.getItem("language");
-	} catch {
-		// Some platforms (mobile, sandboxes) may throw on storage access.
-	}
+	const raw = getLanguage();
 	if (!raw) return null;
 	const norm = raw.toLowerCase();
 	if (norm.startsWith("ko")) return "ko";

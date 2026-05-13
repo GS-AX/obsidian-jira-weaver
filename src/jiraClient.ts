@@ -135,7 +135,7 @@ export class JiraClient {
 
 			try {
 				return JSON.parse(res.text) as T;
-			} catch (e) {
+			} catch {
 				throw new JiraClientError(
 					"parse",
 					"Failed to parse Jira response",
@@ -214,12 +214,15 @@ export class JiraClient {
 function extractErrorMessage(text: string): string | null {
 	if (!text) return null;
 	try {
-		const j = JSON.parse(text);
-		if (Array.isArray(j.errorMessages) && j.errorMessages.length > 0) {
-			return j.errorMessages.join(" ");
-		}
-		if (j.errors && typeof j.errors === "object") {
-			return Object.values(j.errors).join(" ");
+		const j: unknown = JSON.parse(text);
+		if (typeof j === "object" && j !== null) {
+			const o = j as Record<string, unknown>;
+			if (Array.isArray(o.errorMessages) && o.errorMessages.length > 0) {
+				return (o.errorMessages as string[]).join(" ");
+			}
+			if (o.errors && typeof o.errors === "object") {
+				return Object.values(o.errors as Record<string, unknown>).join(" ");
+			}
 		}
 	} catch {
 		/* fall through */

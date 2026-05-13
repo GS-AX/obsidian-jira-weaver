@@ -396,12 +396,14 @@ function serializeScalar(
 	}
 
 	if (mapping.isWikiLink) {
+		if (typeof v === "object") return null;
 		const text = String(v);
 		return yamlString(`[[${sanitizeWikiTarget(text)}]]`);
 	}
 
 	if (typeof v === "boolean") return v ? "true" : "false";
 	if (typeof v === "number") return Number.isFinite(v) ? String(v) : null;
+	if (typeof v === "object") return null;
 	const s = String(v);
 	if (isBareYamlTimestamp(s)) return s;
 	return yamlString(s);
@@ -447,7 +449,7 @@ export function buildRequestedFields(mappings: FieldMapping[]): string[] {
 		// top-level segment after `fields.`.
 		if (m.jsonPath) {
 			const after = m.jsonPath.replace(/^fields\./, "");
-			const head = after.split(/[.\[]/)[0];
+			const head = after.split(/[.[]/)[0];
 			if (head) set.add(head);
 		}
 		if (m.jiraFieldId === "epic") {

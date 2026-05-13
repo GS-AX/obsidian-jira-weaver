@@ -1,9 +1,9 @@
 import {
 	normalizePath,
+	TFile,
+	TFolder,
 	type App,
 	type TAbstractFile,
-	type TFile,
-	type TFolder,
 	type Vault,
 } from "obsidian";
 
@@ -208,7 +208,7 @@ function toBuildCtx(ctx: FileManagerContext) {
 }
 
 function isFolder(f: TAbstractFile): f is TFolder {
-	return (f as TFolder).children !== undefined;
+	return f instanceof TFolder;
 }
 
 function collectMarkdownFiles(folder: TFolder): TFile[] {
@@ -219,8 +219,8 @@ function collectMarkdownFiles(folder: TFolder): TFile[] {
 		for (const child of cur.children) {
 			if (isFolder(child)) {
 				stack.push(child);
-			} else if ((child as TFile).extension === "md") {
-				out.push(child as TFile);
+			} else if (child instanceof TFile && child.extension === "md") {
+				out.push(child);
 			}
 		}
 	}

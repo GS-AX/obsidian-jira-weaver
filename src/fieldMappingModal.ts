@@ -120,11 +120,7 @@ export class FieldMappingModal extends Modal {
 		this.previewEl = previewWrap.createSpan();
 		this.refreshPreview();
 
-		const buttons = contentEl.createDiv({ cls: "modal-button-container" });
-		buttons.style.display = "flex";
-		buttons.style.justifyContent = "flex-end";
-		buttons.style.gap = "8px";
-		buttons.style.marginTop = "1em";
+		const buttons = contentEl.createDiv({ cls: "modal-button-container jira-weaver-modal-buttons" });
 
 		const cancelBtn = buttons.createEl("button", { text: t("modal.cancel") });
 		cancelBtn.addEventListener("click", () => this.close());

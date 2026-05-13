@@ -98,7 +98,7 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: t("settings.title") });
+		new Setting(containerEl).setName(t("settings.title")).setHeading();
 
 		// ── Connection ──────────────────────────────────────────────────
 		new Setting(containerEl)
@@ -182,10 +182,9 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 			cls: "jira-weaver-profile-add",
 		});
 		addBtn.addEventListener("click", () => {
-			new JqlProfileModal(this.app, null, async (profile) => {
+			new JqlProfileModal(this.app, null, (profile) => {
 				this.plugin.settings.jqlProfiles.push(profile);
-				await this.plugin.saveSettings();
-				this.display();
+				void this.plugin.saveSettings().then(() => this.display());
 			}).open();
 		});
 
@@ -317,9 +316,9 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 			const checkbox = toggleWrap.createEl("input");
 			checkbox.type = "checkbox";
 			checkbox.checked = p.enabled;
-			checkbox.addEventListener("change", async () => {
+			checkbox.addEventListener("change", () => {
 				profiles[i].enabled = checkbox.checked;
-				await this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 			});
 
 			// Name
@@ -334,16 +333,15 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 			editBtn.textContent = "✎";
 			editBtn.title = t("settings.profileName");
 			editBtn.addEventListener("click", () => {
-				new JqlProfileModal(this.app, p, async (updated) => {
+				new JqlProfileModal(this.app, p, (updated) => {
 					profiles[i] = updated;
-					await this.plugin.saveSettings();
-					this.display();
+					void this.plugin.saveSettings().then(() => this.display());
 				}).open();
 			});
 
 			// Delete button
 			const delBtn = row.createEl("button", { text: t("settings.profileDelete") });
-			delBtn.style.color = "var(--color-red)";
+			delBtn.addClass("jira-weaver-profile-delete");
 			delBtn.addEventListener("click", async () => {
 				if (profiles.length <= 1) {
 					new Notice(t("settings.profileAtLeastOne"));
@@ -419,7 +417,7 @@ class JqlProfileModal extends Modal {
 						this.draft.jqlQuery = v;
 					});
 				area.inputEl.rows = 3;
-				area.inputEl.style.width = "100%";
+				area.inputEl.addClass("jira-weaver-jql-textarea");
 				area.inputEl.spellcheck = false;
 			});
 
@@ -447,8 +445,7 @@ class JqlProfileModal extends Modal {
 				text.inputEl.min = "1";
 			});
 
-		const buttons = contentEl.createDiv({ cls: "modal-button-container" });
-		buttons.style.cssText = "display:flex;justify-content:flex-end;gap:8px;margin-top:1em";
+		const buttons = contentEl.createDiv({ cls: "modal-button-container jira-weaver-modal-buttons" });
 
 		buttons.createEl("button", { text: t("modal.cancel") }).addEventListener("click", () =>
 			this.close(),

@@ -19,7 +19,7 @@ import type { JiraIssueLink, JiraIssueLinkRef } from "./types";
 
 /** Strip characters that would break a wiki link target. */
 export function sanitizeWikiTarget(s: string): string {
-	return s.replace(/[\[\]\|#^]/g, "").trim();
+	return s.replace(/[[\]|#^]/g, "").trim();
 }
 
 /** Wrap a target as `[[X]]` after sanitization. */
@@ -118,7 +118,7 @@ export function resolveEpic(
  */
 export function slugify(s: string): string {
 	return s
-		.replace(/[\\/:*?"<>|#^\[\]]/g, "")
+		.replace(/[\\/:*?"<>|#^[\]]/g, "")
 		.replace(/\s+/g, "_")
 		.replace(/_+/g, "_")
 		.replace(/^_+|_+$/g, "")

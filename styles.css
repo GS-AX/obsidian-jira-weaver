@@ -54,3 +54,79 @@
 	color: var(--text-muted);
 	margin-left: 4px;
 }
+
+/* ── Shared modal buttons ─────────────────────────────────────────────── */
+
+.jira-weaver-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 1em;
+}
+
+/* ── Field mapping grid ───────────────────────────────────────────────── */
+
+.jira-weaver-mapping-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+/* ── Available fields panel ──────────────────────────────────────────── */
+
+.jira-weaver-field-search {
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+.jira-weaver-available-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 2px 0;
+}
+
+.jira-weaver-field-id {
+	opacity: 0.6;
+}
+
+.jira-weaver-add-custom-btn {
+	margin-top: 8px;
+}
+
+/* ── Active mappings panel ───────────────────────────────────────────── */
+
+.jira-weaver-active-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.jira-weaver-active-row-label {
+	flex: 1;
+}
+
+.jira-weaver-missing-badge {
+	color: var(--color-orange);
+	margin-left: 6px;
+}
+
+/* ── Profile settings ────────────────────────────────────────────────── */
+
+.jira-weaver-profile-delete {
+	color: var(--color-red);
+}
+
+/* ── JQL textarea ────────────────────────────────────────────────────── */
+
+.jira-weaver-jql-textarea {
+	width: 100%;
+}
+
+/* ── Sync log ────────────────────────────────────────────────────────── */
+
+.jira-weaver-log-stat--error {
+	color: var(--color-red);
+}

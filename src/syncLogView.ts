@@ -123,7 +123,7 @@ export class SyncLogView extends ItemView {
 		addStat(statsEl, t("log.skipped"), r.skipped);
 		if (r.errors > 0) {
 			const errEl = addStat(statsEl, t("log.errors"), r.errors);
-			errEl.style.color = "var(--color-red)";
+			errEl.addClass("jira-weaver-log-stat--error");
 		}
 		if (r.markerWarnings.length > 0) {
 			addStat(statsEl, t("log.markerWarnings"), r.markerWarnings.length);

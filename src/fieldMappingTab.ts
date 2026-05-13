@@ -1,4 +1,4 @@
-import { Modal, Notice, Setting, type App, type TFile } from "obsidian";
+import { Modal, Notice, Setting, TFile, type App } from "obsidian";
 
 import { i18n, t } from "./i18n";
 import { FieldMappingModal } from "./fieldMappingModal";
@@ -60,14 +60,14 @@ export class FieldMappingPanel {
 		headerRow.createEl("h3", { text: t("mapping.header") });
 
 		const reloadBtn = headerRow.createEl("button", { text: `↺ ${t("mapping.reload")}` });
-		reloadBtn.addEventListener("click", () => this.handleReload(reloadBtn));
+		reloadBtn.addEventListener("click", () => { void this.handleReload(reloadBtn); });
 
 		// Preset export / import
 		const exportBtn = headerRow.createEl("button", { text: `↑ ${t("mapping.exportPreset")}` });
-		exportBtn.addEventListener("click", () => this.exportPreset());
+		exportBtn.addEventListener("click", () => { void this.exportPreset(); });
 
 		const importBtn = headerRow.createEl("button", { text: `↓ ${t("mapping.importPreset")}` });
-		importBtn.addEventListener("click", () => this.importPreset());
+		importBtn.addEventListener("click", () => { void this.importPreset(); });
 
 		const fetchedAt = this.plugin.settings.fieldCatalogFetchedAt;
 		const fetchedLabel = fetchedAt
@@ -79,9 +79,6 @@ export class FieldMappingPanel {
 		});
 
 		const grid = this.container.createDiv({ cls: "jira-weaver-mapping-grid" });
-		grid.style.display = "grid";
-		grid.style.gridTemplateColumns = "1fr 1fr";
-		grid.style.gap = "16px";
 
 		this.renderAvailable(grid.createDiv());
 		this.renderActive(grid.createDiv());
@@ -104,8 +101,8 @@ export class FieldMappingPanel {
 		try {
 			const json = JSON.stringify(this.plugin.settings.fieldMappings, null, 2);
 			const existing = this.app.vault.getAbstractFileByPath(path);
-			if (existing) {
-				await this.app.vault.modify(existing as TFile, json);
+			if (existing instanceof TFile) {
+				await this.app.vault.modify(existing, json);
 			} else {
 				await this.app.vault.create(path, json);
 			}
@@ -119,11 +116,11 @@ export class FieldMappingPanel {
 		const path = "jira-weaver-preset.json";
 		try {
 			const file = this.app.vault.getAbstractFileByPath(path);
-			if (!file) {
+			if (!(file instanceof TFile)) {
 				new Notice(t("mapping.importError", { reason: `File not found: ${path}` }));
 				return;
 			}
-			const json = await this.app.vault.read(file as TFile);
+			const json = await this.app.vault.read(file);
 			const mappings = JSON.parse(json) as FieldMapping[];
 			if (!Array.isArray(mappings)) throw new Error("Expected an array of mappings");
 			this.plugin.settings.fieldMappings = mappings;
@@ -147,8 +144,7 @@ export class FieldMappingPanel {
 			placeholder: t("mapping.search"),
 			value: this.filter,
 		});
-		search.style.width = "100%";
-		search.style.marginBottom = "8px";
+		search.addClass("jira-weaver-field-search");
 		search.addEventListener("input", () => {
 			this.filter = search.value;
 			this.refreshAvailableList(listHost);
@@ -186,14 +182,11 @@ export class FieldMappingPanel {
 	}
 
 	private renderAvailableRow(field: FieldCatalogEntry): HTMLElement {
-		const row = document.createElement("label");
-		row.style.display = "flex";
-		row.style.alignItems = "center";
-		row.style.gap = "6px";
-		row.style.padding = "2px 0";
+		const row = activeDocument.createElement("label");
+		row.className = "jira-weaver-available-row";
 
 		const mapping = this.findMapping(field.id);
-		const checkbox = document.createElement("input");
+		const checkbox = activeDocument.createElement("input");
 		checkbox.type = "checkbox";
 		checkbox.checked = mapping?.isEnabled ?? false;
 
@@ -203,17 +196,16 @@ export class FieldMappingPanel {
 			checkbox.title = t("mapping.descriptionLocked");
 		}
 
-		checkbox.addEventListener("change", async () => {
+		checkbox.addEventListener("change", () => {
 			if (field.id === "description") return;
-			await this.toggleField(field, checkbox.checked);
-			this.render();
+			void this.toggleField(field, checkbox.checked).then(() => this.render());
 		});
 
 		row.appendChild(checkbox);
-		const labelText = document.createElement("span");
+		const labelText = activeDocument.createElement("span");
 		labelText.textContent = `${field.name}`;
-		const sub = document.createElement("small");
-		sub.style.opacity = "0.6";
+		const sub = activeDocument.createElement("small");
+		sub.className = "jira-weaver-field-id";
 		sub.textContent = ` (${field.id})`;
 		labelText.appendChild(sub);
 		row.appendChild(labelText);
@@ -270,8 +262,8 @@ export class FieldMappingPanel {
 
 		const addBtn = host.createEl("button", {
 			text: `+ ${t("mapping.addCustom")}`,
+			cls: "jira-weaver-add-custom-btn",
 		});
-		addBtn.style.marginTop = "8px";
 		addBtn.addEventListener("click", () => this.openAddCustomDialog());
 	}
 
@@ -279,39 +271,34 @@ export class FieldMappingPanel {
 		mapping: FieldMapping,
 		enabledList: FieldMapping[],
 	): HTMLElement {
-		const row = document.createElement("div");
-		row.style.display = "flex";
-		row.style.alignItems = "center";
-		row.style.gap = "6px";
-		row.style.padding = "4px 0";
-		row.style.borderBottom = "1px solid var(--background-modifier-border)";
+		const row = activeDocument.createElement("div");
+		row.className = "jira-weaver-active-row";
 
-		const upBtn = document.createElement("button");
+		const upBtn = activeDocument.createElement("button");
 		upBtn.textContent = t("mapping.up");
 		upBtn.title = "Move up";
-		upBtn.addEventListener("click", () => this.move(mapping, -1));
+		upBtn.addEventListener("click", () => { void this.move(mapping, -1); });
 		row.appendChild(upBtn);
 
-		const downBtn = document.createElement("button");
+		const downBtn = activeDocument.createElement("button");
 		downBtn.textContent = t("mapping.down");
 		downBtn.title = "Move down";
-		downBtn.addEventListener("click", () => this.move(mapping, +1));
+		downBtn.addEventListener("click", () => { void this.move(mapping, +1); });
 		row.appendChild(downBtn);
 
-		const label = document.createElement("span");
-		label.style.flex = "1";
+		const label = activeDocument.createElement("span");
+		label.className = "jira-weaver-active-row-label";
 		label.textContent = `${mapping.jiraFieldId} → ${mapping.obsidianKey}`;
 		if (mapping.isWikiLink) label.textContent += " " + t("mapping.wikiBadge");
 		if (mapping.missing) {
-			const badge = document.createElement("span");
-			badge.style.color = "var(--color-orange)";
-			badge.style.marginLeft = "6px";
+			const badge = activeDocument.createElement("span");
+			badge.className = "jira-weaver-missing-badge";
 			badge.textContent = t("mapping.missingBadge");
 			label.appendChild(badge);
 		}
 		row.appendChild(label);
 
-		const editBtn = document.createElement("button");
+		const editBtn = activeDocument.createElement("button");
 		editBtn.textContent = t("mapping.edit");
 		editBtn.addEventListener("click", () => this.openEditModal(mapping));
 		row.appendChild(editBtn);
@@ -329,13 +316,12 @@ export class FieldMappingPanel {
 			allMappings: this.plugin.settings.fieldMappings,
 			sampleIssue: null,
 			nullFieldBehavior: this.plugin.settings.nullFieldBehavior,
-			onSave: async (next) => {
+			onSave: (next) => {
 				const all = [...this.plugin.settings.fieldMappings];
 				const idx = all.findIndex((m) => m.jiraFieldId === mapping.jiraFieldId);
 				if (idx >= 0) all[idx] = { ...all[idx], ...next };
 				this.plugin.settings.fieldMappings = all;
-				await this.plugin.saveSettings();
-				this.render();
+				void this.plugin.saveSettings().then(() => this.render());
 			},
 		});
 		modal.open();
@@ -363,7 +349,7 @@ export class FieldMappingPanel {
 	private openAddCustomDialog(): void {
 		new AddCustomFieldModal(this.app, {
 			existing: this.plugin.settings.fieldMappings,
-			onAdd: async (id, name) => {
+			onAdd: (id, name) => {
 				const mappings = [...this.plugin.settings.fieldMappings];
 				if (mappings.some((m) => m.jiraFieldId === id)) {
 					new Notice(t("mapping.addCustomDuplicate", { id }));
@@ -381,8 +367,7 @@ export class FieldMappingPanel {
 				};
 				mappings.push(mapping);
 				this.plugin.settings.fieldMappings = mappings;
-				await this.plugin.saveSettings();
-				this.render();
+				void this.plugin.saveSettings().then(() => this.render());
 			},
 		}).open();
 	}
@@ -467,11 +452,7 @@ class AddCustomFieldModal extends Modal {
 				}),
 			);
 
-		const buttons = contentEl.createDiv({ cls: "modal-button-container" });
-		buttons.style.display = "flex";
-		buttons.style.justifyContent = "flex-end";
-		buttons.style.gap = "8px";
-		buttons.style.marginTop = "1em";
+		const buttons = contentEl.createDiv({ cls: "modal-button-container jira-weaver-modal-buttons" });
 
 		const cancelBtn = buttons.createEl("button", {
 			text: t("mapping.addCustomCancel"),
