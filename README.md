@@ -31,8 +31,8 @@
 
 ### Manual installation
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/obsidian-jira-weaver/obsidian-jira-weaver/releases).
-2. Copy them into `<your vault>/.obsidian/plugins/jira-weaver/`.
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/GS-AX/obsidian-jira-weaver/releases).
+2. Copy them into your vault's `.obsidian/plugins/jira-weaver/` folder.
 3. Reload Obsidian and enable the plugin under **Settings → Community plugins**.
 
 ---
@@ -76,7 +76,7 @@ Use the **command palette** (`Ctrl/Cmd+P`) and search for:
 
 ## Generated File Format
 
-Each issue is saved as a Markdown file named `<KEY> <Summary>.md`.
+Each issue is saved as a Markdown file named `KEY_summary-slug.md` (e.g. `PRJ-123_fix-login-bug.md`).
 
 ```markdown
 ---
