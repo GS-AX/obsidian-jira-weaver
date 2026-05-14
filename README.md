@@ -90,35 +90,47 @@ Each issue is saved as a Markdown file named `KEY_summary-slug.md` (e.g. `PRJ-12
 
 ```markdown
 ---
-key: PRJ-123
-title: Fix login bug
+jira_key: PRJ-123
+title: "Fix login bug on SSO redirect"
 status: In Progress
 priority: High
-assignee: Jane Doe
-reporter: John Smith
+assignee: "alice"
+reporter: "bob"
 created: "2025-01-15"
 updated: "2025-04-01"
-jira_url: https://acme.atlassian.net/browse/PRJ-123
+jira_url: "https://acme.atlassian.net/browse/PRJ-123"
 ---
+
+# PRJ-123: Fix login bug on SSO redirect
+
+> **[View in Jira](https://acme.atlassian.net/browse/PRJ-123)** | Status: `In Progress` | Priority: `High`
 
 ## 📋 Description
 
-Full description text from Jira…
+Users are redirected to a blank page after SSO login when the session cookie is missing. The issue occurs on Chrome 120+ with third-party cookies blocked.
+
+Steps to reproduce:
+1. Open the app in an incognito window
+2. Click "Login with SSO"
+3. After authentication, the page is blank instead of the dashboard
 
 ## 🔗 Related Info
 
-| Field    | Value     |
-|----------|-----------|
-| Status   | In Progress |
-| Priority | High      |
+| Field    | Value        |
+|----------|--------------|
+| Assignee | alice        |
+| Reporter | bob          |
+| Created  | 2025-01-15   |
+| Updated  | 2025-04-01   |
 
-*Last synced: 2025-05-10 09:30*
+---
+*Last synced: 2025-05-10 09:30:00*
 
 <!-- jira-weaver:end -->
 
 ## ✏️ My Notes
 
-Everything below the marker is yours — it survives every sync.
+Notes written here are preserved across every sync.
 ```
 
 ---
