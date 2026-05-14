@@ -47,7 +47,7 @@ Open **Settings → Jira Weaver**.
 |---|---|
 | **Auth mode** | `Bearer token` for Server/Data Center; `Basic auth` for Cloud |
 | **Jira email** | (Cloud only) the email address on your Atlassian account |
-| **Jira domain** | Base URL, e.g. `https://mycompany.atlassian.net` |
+| **Jira domain** | Base URL of your Jira instance (e.g. `https://acme.atlassian.net` for Cloud, `https://jira.internal` for DC) |
 | **Personal Access Token** | API token; stored locally, never transmitted elsewhere |
 
 ### 2. Add a JQL profile
@@ -88,7 +88,7 @@ assignee: Jane Doe
 reporter: John Smith
 created: "2025-01-15"
 updated: "2025-04-01"
-jira_url: https://mycompany.atlassian.net/browse/PRJ-123
+jira_url: https://acme.atlassian.net/browse/PRJ-123
 ---
 
 ## 📋 Description
