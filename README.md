@@ -37,6 +37,16 @@
 
 ---
 
+## Screenshots
+
+![Settings](https://github.com/GS-AX/obsidian-jira-weaver/raw/main/screenshots/settings.png)
+
+![Field Mapping](https://github.com/GS-AX/obsidian-jira-weaver/raw/main/screenshots/field-mapping.png)
+
+![JQL Profile](https://github.com/GS-AX/obsidian-jira-weaver/raw/main/screenshots/jql-profile.png)
+
+---
+
 ## Quick Start
 
 ### 1. Configure connection
