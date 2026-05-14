@@ -83,7 +83,7 @@ export class FileManager {
 		const files = collectMarkdownFiles(folder);
 		for (const file of files) {
 			const cache = this.app.metadataCache.getFileCache(file);
-			const key = cache?.frontmatter?.jira_key;
+			const key: unknown = cache?.frontmatter?.["jira_key"];
 			if (typeof key === "string" && key.length > 0) {
 				map.set(key, file);
 			}

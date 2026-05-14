@@ -119,7 +119,7 @@ function interpolate(
 }
 
 export const i18n = new I18n();
-export const t: (key: string, vars?: Record<string, string | number>) => string = i18n.t.bind(i18n);
+export const t = (key: string, vars?: Record<string, string | number>): string => i18n.t(key, vars);
 
 /* -------------------------------------------------------------------------- */
 /*  Locale resolution (PRD §3.8.3)                                            */

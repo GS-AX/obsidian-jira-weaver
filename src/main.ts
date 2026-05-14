@@ -12,7 +12,6 @@ import {
 	buildDefaultFieldMappings,
 	emptySyncResult,
 	type FieldCatalogEntry,
-	type JiraIssue,
 	type JqlProfile,
 	type JiraPluginSettings,
 	type SupportedLocale,
@@ -292,7 +291,7 @@ export default class JiraWeaverPlugin extends Plugin {
 		for (const issue of search.issues ?? []) {
 			try {
 				const detail = await fm.syncIssue(
-					issue as JiraIssue,
+					issue,
 					ctx,
 					{ force: opts.force },
 				);

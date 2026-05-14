@@ -396,15 +396,15 @@ function serializeScalar(
 	}
 
 	if (mapping.isWikiLink) {
-		if (typeof v === "object") return null;
+		if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") return null;
 		const text = String(v);
 		return yamlString(`[[${sanitizeWikiTarget(text)}]]`);
 	}
 
 	if (typeof v === "boolean") return v ? "true" : "false";
 	if (typeof v === "number") return Number.isFinite(v) ? String(v) : null;
-	if (typeof v === "object") return null;
-	const s = String(v);
+	if (typeof v !== "string") return null;
+	const s = v;
 	if (isBareYamlTimestamp(s)) return s;
 	return yamlString(s);
 }

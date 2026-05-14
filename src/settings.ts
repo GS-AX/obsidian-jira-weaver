@@ -342,14 +342,13 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 			// Delete button
 			const delBtn = row.createEl("button", { text: t("settings.profileDelete") });
 			delBtn.addClass("jira-weaver-profile-delete");
-			delBtn.addEventListener("click", async () => {
+			delBtn.addEventListener("click", () => {
 				if (profiles.length <= 1) {
 					new Notice(t("settings.profileAtLeastOne"));
 					return;
 				}
 				profiles.splice(i, 1);
-				await this.plugin.saveSettings();
-				this.display();
+				void this.plugin.saveSettings().then(() => this.display());
 			});
 
 			row.appendChild(toggleWrap);
