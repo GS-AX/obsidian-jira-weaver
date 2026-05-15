@@ -126,12 +126,14 @@ Steps to reproduce:
 ---
 *Last synced: 2025-05-10 09:30:00*
 
-<!-- jira-weaver:end -->
+[jira-weaver:end]
 
 ## ✏️ My Notes
 
 Notes written here are preserved across every sync.
 ```
+
+> The actual marker written to files is `<!-- jira-weaver:end -->`
 
 ---
 
