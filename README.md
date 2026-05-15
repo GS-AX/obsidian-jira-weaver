@@ -1,6 +1,6 @@
 # Jira Weaver
 
-**Jira Weaver** is an [Obsidian](https://obsidian.md) community plugin that syncs Jira issues directly into your Vault. Like weaving threads, it interlinks Jira issues with Obsidian's wiki links, Graph View, and Dataview into a rich knowledge network.
+**Jira Weaver** is an community plugin that syncs Jira issues directly into your Vault. Like weaving threads, it interlinks Jira issues with wiki links, Graph View, and Dataview into a rich knowledge network.
 
 > **Language:** [한국어 README](README.ko.md)
 
@@ -23,7 +23,7 @@
 
 ## Installation
 
-### From Obsidian Community Plugins (recommended)
+### From Community Plugins (recommended)
 
 1. Open **Settings → Community plugins → Browse**.
 2. Search for **Jira Weaver** and click **Install**.
@@ -33,7 +33,7 @@
 
 1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/GS-AX/obsidian-jira-weaver/releases).
 2. Copy them into your vault's `.obsidian/plugins/jira-weaver/` folder.
-3. Reload Obsidian and enable the plugin under **Settings → Community plugins**.
+3. Reload and enable the plugin under **Settings → Community plugins**.
 
 ---
 
