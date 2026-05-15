@@ -11,7 +11,7 @@
 - **One-click sync** — pull Jira issues into Markdown files with structured YAML Frontmatter
 - **Custom field mapping** — map any Jira system or custom field to an Obsidian Frontmatter key
 - **Multiple JQL profiles** — sync different queries into different folders simultaneously
-- **Memo protection** — a `<!-- jira-weaver:end -->` marker preserves your personal notes below the Jira block
+- **Memo protection** — a section marker preserves your personal notes below the Jira block
 - **Wiki-link wrapping** — turn field values into `[[wiki links]]` for Graph View and Dataview queries
 - **Sync log panel** — per-profile history of created / updated / skipped / error counts
 - **Field preset export / import** — share field mapping configurations across vaults or with teammates
@@ -77,10 +77,10 @@ Use the **command palette** (`Ctrl/Cmd+P`) and search for:
 
 | Command | Description |
 |---|---|
-| `Jira Weaver: Sync Issues` | Normal sync (skips unchanged issues) |
-| `Jira Weaver: Force Sync Issues (Overwrite All)` | Overwrites every file regardless of update time |
-| `Jira Weaver: Reload Field List` | Fetches the current Jira field list (needed for custom fields) |
-| `Jira Weaver: Open Sync Log` | Opens the sync history panel |
+| `Sync Issues` | Normal sync (skips unchanged issues) |
+| `Force Sync Issues (Overwrite All)` | Overwrites every file regardless of update time |
+| `Reload Field List` | Fetches the current Jira field list (needed for custom fields) |
+| `Open Sync Log` | Opens the sync history panel |
 
 ---
 
@@ -88,7 +88,7 @@ Use the **command palette** (`Ctrl/Cmd+P`) and search for:
 
 Each issue is saved as a Markdown file named `KEY_summary-slug.md` (e.g. `PRJ-123_fix-login-bug.md`).
 
-```markdown
+```
 ---
 jira_key: PRJ-123
 title: "Fix login bug on SSO redirect"
@@ -103,43 +103,30 @@ jira_url: "https://acme.atlassian.net/browse/PRJ-123"
 
 # PRJ-123: Fix login bug on SSO redirect
 
-> **[View in Jira](https://acme.atlassian.net/browse/PRJ-123)** | Status: `In Progress` | Priority: `High`
-
-## 📋 Description
-
-Users are redirected to a blank page after SSO login when the session cookie is missing. The issue occurs on Chrome 120+ with third-party cookies blocked.
-
-Steps to reproduce:
-1. Open the app in an incognito window
-2. Click "Login with SSO"
-3. After authentication, the page is blank instead of the dashboard
-
-## 🔗 Related Info
+Users are redirected to a blank page after SSO login when the
+session cookie is missing.
 
 | Field    | Value        |
 |----------|--------------|
 | Assignee | alice        |
 | Reporter | bob          |
 | Created  | 2025-01-15   |
-| Updated  | 2025-04-01   |
 
 ---
-*Last synced: 2025-05-10 09:30:00*
+Last synced: 2025-05-10 09:30:00
 
-[jira-weaver:end]
+[jira-weaver section end — notes below are preserved]
 
-## ✏️ My Notes
+## My Notes
 
 Notes written here are preserved across every sync.
 ```
-
-> The actual marker written to files is `<!-- jira-weaver:end -->`
 
 ---
 
 ## Memo Protection
 
-The `<!-- jira-weaver:end -->` marker separates the Jira-managed block (above) from your personal notes (below). On each sync, only the content above the marker is rewritten.
+A hidden section marker is written at the end of the Jira-managed block. On each sync, only the content above the marker is rewritten — everything below is left untouched.
 
 If the marker is missing, the **Memo protection → When the marker is missing** setting controls the behaviour:
 
@@ -181,7 +168,7 @@ Use **Export preset** / **Import preset** buttons to save or restore your field 
 
 ## Privacy & Security
 
-- Your domain URL, token, and email are stored in Obsidian's own plugin data (`data.json` inside the plugin folder). They are **never** sent anywhere other than your Jira instance.
+- Your domain URL, token, and email are stored in the plugin's local data file. They are **never** sent anywhere other than your Jira instance.
 - Network requests go only to the domain you configure.
 
 ---
@@ -194,7 +181,7 @@ Use **Export preset** / **Import preset** buttons to save or restore your field 
 | "JQL error" notice | Test your JQL in Jira's issue search first |
 | Custom fields not appearing | Click **Reload fields** after entering connection details |
 | No files created | Check that the JQL query returns issues and that the target folder path is valid |
-| Notes lost after sync | Ensure the `<!-- jira-weaver:end -->` marker is present in the file |
+| Notes lost after sync | Make sure not to remove the section marker line at the end of the Jira block |
 
 ---
 
