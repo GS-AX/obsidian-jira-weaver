@@ -2,7 +2,7 @@
 
 **Jira Weaver** is an community plugin that syncs Jira issues directly into your Vault. Like weaving threads, it interlinks Jira issues with wiki links, Graph View, and Dataview into a rich knowledge network.
 
-> **Language:** [한국어 README](README.ko.md)
+> **Language:** [한국어 README](https://github.com/GS-AX/obsidian-jira-weaver/blob/main/README.ko.md)
 
 ---
 
