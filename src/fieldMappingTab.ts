@@ -316,6 +316,7 @@ export class FieldMappingPanel {
 			allMappings: this.plugin.settings.fieldMappings,
 			sampleIssue: null,
 			nullFieldBehavior: this.plugin.settings.nullFieldBehavior,
+			dateTimezone: this.plugin.settings.dateTimezone ?? "local",
 			onSave: (next) => {
 				const all = [...this.plugin.settings.fieldMappings];
 				const idx = all.findIndex((m) => m.jiraFieldId === mapping.jiraFieldId);

@@ -107,6 +107,9 @@ export interface JiraPluginSettings {
 	syncInterval: number; // minutes, used when syncTrigger === "interval"
 	noMarkerBehavior: NoMarkerBehavior;
 
+	// Timezone (v0.5.3) — "local" uses system timezone; IANA string overrides
+	dateTimezone: string;
+
 	// Cached field catalog from /rest/api/2/field. Populated by the
 	// "Reload Field List" command; consumed by the mapping panel to
 	// list "Available Fields".
@@ -279,6 +282,7 @@ export const DEFAULT_SETTINGS: JiraPluginSettings = {
 	syncTrigger: "manual",
 	syncInterval: 30,
 	noMarkerBehavior: "overwrite",
+	dateTimezone: "local",
 };
 
 /* -------------------------------------------------------------------------- */

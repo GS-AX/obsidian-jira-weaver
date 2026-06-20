@@ -33,6 +33,7 @@ export { slugify };
 
 export interface ResolveContext {
 	nullFieldBehavior: NullFieldBehavior;
+	dateTimezone: string; // "local" or IANA timezone string
 }
 
 export interface ResolvedField {
@@ -87,7 +88,7 @@ function resolveOne(
 	const raw = extractRaw(issue, mapping);
 
 	// [2] normalize per ValueType — produces a plain JS value
-	const plain = normalize(raw, mapping);
+	const plain = normalize(raw, mapping, ctx.dateTimezone);
 
 	// null/empty handling per PRD §3.7.6
 	if (isNullish(plain)) {
@@ -240,7 +241,7 @@ function resolveEpicRaw(
 /*  [2] ValueType normalization                                               */
 /* -------------------------------------------------------------------------- */
 
-function normalize(raw: unknown, mapping: FieldMapping): unknown {
+function normalize(raw: unknown, mapping: FieldMapping, tz: string): unknown {
 	if (raw === null || raw === undefined) return null;
 
 	switch (mapping.valueType) {
@@ -251,9 +252,9 @@ function normalize(raw: unknown, mapping: FieldMapping): unknown {
 		case "boolean":
 			return toBoolean(raw);
 		case "date":
-			return toDate(raw);
+			return toDate(raw, tz);
 		case "datetime":
-			return toDateTime(raw);
+			return toDateTime(raw, tz);
 		case "array":
 			return toArray(raw, mapping);
 		case "user":
@@ -308,17 +309,59 @@ function toBoolean(raw: unknown): boolean | null {
 	return null;
 }
 
-function toDate(raw: unknown): string | null {
-	if (typeof raw !== "string") return null;
-	const m = /^(\d{4}-\d{2}-\d{2})/.exec(raw);
-	return m ? m[1] : null;
-}
-
-function toDateTime(raw: unknown): string | null {
+function toDate(raw: unknown, tz: string): string | null {
 	if (typeof raw !== "string") return null;
 	const d = new Date(raw);
 	if (isNaN(d.getTime())) return null;
-	return d.toISOString().replace(/\.\d{3}Z$/, "Z");
+	return formatInTimezone(d, tz, "date");
+}
+
+function toDateTime(raw: unknown, tz: string): string | null {
+	if (typeof raw !== "string") return null;
+	const d = new Date(raw);
+	if (isNaN(d.getTime())) return null;
+	return formatInTimezone(d, tz, "datetime");
+}
+
+/**
+ * Format a Date in the given timezone.
+ * "local" uses the system timezone via getFullYear/getMonth/etc. (local methods).
+ * Any IANA string uses Intl.DateTimeFormat to extract the parts.
+ */
+function formatInTimezone(d: Date, tz: string, mode: "date" | "datetime"): string {
+	const pad = (n: number) => String(n).padStart(2, "0");
+
+	if (tz === "local") {
+		if (mode === "date") {
+			return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+		}
+		return (
+			`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+			`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+		);
+	}
+
+	// Use Intl to decompose the date in the target timezone
+	const fmt = new Intl.DateTimeFormat("en-CA", {
+		timeZone: tz,
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		...(mode === "datetime" && {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+		}),
+	});
+	const parts = Object.fromEntries(fmt.formatToParts(d).map((p) => [p.type, p.value]));
+
+	if (mode === "date") {
+		return `${parts.year}-${parts.month}-${parts.day}`;
+	}
+	// hour12:false can return "24" for midnight — normalize to "00"
+	const hour = parts.hour === "24" ? "00" : parts.hour;
+	return `${parts.year}-${parts.month}-${parts.day} ${hour}:${parts.minute}:${parts.second}`;
 }
 
 function toArray(raw: unknown, mapping: FieldMapping): unknown[] | null {

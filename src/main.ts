@@ -286,6 +286,7 @@ export default class JiraWeaverPlugin extends Plugin {
 			mappings: this.settings.fieldMappings,
 			nullFieldBehavior: this.settings.nullFieldBehavior,
 			noMarkerBehavior: this.settings.noMarkerBehavior,
+			dateTimezone: this.settings.dateTimezone ?? "local",
 		};
 
 		for (const issue of search.issues ?? []) {

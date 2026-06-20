@@ -51,6 +51,7 @@ export interface BuildContext {
 	syncedAt: Date;
 	mappings: FieldMapping[];
 	nullFieldBehavior: NullFieldBehavior;
+	dateTimezone: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -68,6 +69,7 @@ export function buildSyncedRegion(
 ): string {
 	const resolved = resolveAllFields(issue, ctx.mappings, {
 		nullFieldBehavior: ctx.nullFieldBehavior,
+		dateTimezone: ctx.dateTimezone,
 	});
 	const fm = buildFrontmatter(issue, resolved, ctx);
 	const body = buildBody(issue, resolved, ctx);
@@ -151,7 +153,7 @@ function buildBody(
 	}`;
 
 	const relatedTable = buildRelatedInfoTable(resolved);
-	const syncedAt = formatLocalTimestamp(ctx.syncedAt);
+	const syncedAt = formatInTimezone(ctx.syncedAt, ctx.dateTimezone);
 	const meta = `---\n*${t("file.lastSynced", { timestamp: syncedAt })}*`;
 
 	return [heading, "", subline, "", descBlock, "", relatedTable, "", meta].join(
@@ -234,12 +236,29 @@ function buildIssueUrl(domain: string, key: string): string {
 	return `${base}/browse/${encodeURIComponent(key)}`;
 }
 
-function formatLocalTimestamp(d: Date): string {
+function formatInTimezone(d: Date, tz: string): string {
 	const pad = (n: number) => String(n).padStart(2, "0");
-	return (
-		`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
-		`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-	);
+
+	if (tz === "local") {
+		return (
+			`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+			`${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+		);
+	}
+
+	const fmt = new Intl.DateTimeFormat("en-CA", {
+		timeZone: tz,
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		hour12: false,
+	});
+	const parts = Object.fromEntries(fmt.formatToParts(d).map((p) => [p.type, p.value]));
+	const hour = parts.hour === "24" ? "00" : parts.hour;
+	return `${parts.year}-${parts.month}-${parts.day} ${hour}:${parts.minute}:${parts.second}`;
 }
 
 /* -------------------------------------------------------------------------- */

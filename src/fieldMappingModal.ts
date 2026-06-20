@@ -48,6 +48,7 @@ export interface FieldMappingModalParams {
 	/** Optional sample issue used for the live preview cell. */
 	sampleIssue?: JiraIssue | null;
 	nullFieldBehavior: NullFieldBehavior;
+	dateTimezone: string;
 	onSave: (next: FieldMapping) => void;
 }
 
@@ -151,6 +152,7 @@ export class FieldMappingModal extends Modal {
 		}
 		const [resolved] = resolveAllFields(sample, [this.draft], {
 			nullFieldBehavior: this.params.nullFieldBehavior,
+			dateTimezone: this.params.dateTimezone,
 		});
 		if (!resolved || resolved.yaml === undefined) {
 			this.previewEl.setText(`${this.draft.obsidianKey}: (omitted)`);

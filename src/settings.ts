@@ -57,6 +57,12 @@ i18n.registerDefaults({
 	"settings.nullBehaviorOmit": "Omit (default)",
 	"settings.nullBehaviorExplicit": "Explicit null",
 
+	// Timezone
+	"settings.timezoneName": "Date timezone",
+	"settings.timezoneDesc":
+		"Timezone used when converting Jira date/datetime fields and the Last synced timestamp. \"Local\" follows your system clock.",
+	"settings.timezoneLocal": "Local (system)",
+
 	// Language
 	"settings.languageName": "Language",
 	"settings.languageDesc":
@@ -207,6 +213,37 @@ export class JiraWeaverSettingTab extends PluginSettingTab {
 				dd.onChange(async (v) => {
 					this.plugin.settings.nullFieldBehavior =
 						v === "explicit" ? "explicit" : "omit";
+					await this.plugin.saveSettings();
+				});
+			});
+
+		// ── Timezone ─────────────────────────────────────────────────────
+		new Setting(containerEl)
+			.setName(t("settings.timezoneName"))
+			.setDesc(t("settings.timezoneDesc"))
+			.addDropdown((dd) => {
+				const zones: Array<[string, string]> = [
+					["local",            t("settings.timezoneLocal")],
+					["UTC",              "UTC"],
+					["Asia/Seoul",       "Asia/Seoul (KST, UTC+9)"],
+					["Asia/Tokyo",       "Asia/Tokyo (JST, UTC+9)"],
+					["Asia/Shanghai",    "Asia/Shanghai (CST, UTC+8)"],
+					["Asia/Singapore",   "Asia/Singapore (SGT, UTC+8)"],
+					["Asia/Kolkata",     "Asia/Kolkata (IST, UTC+5:30)"],
+					["Europe/London",    "Europe/London (GMT/BST)"],
+					["Europe/Paris",     "Europe/Paris (CET/CEST, UTC+1/2)"],
+					["Europe/Berlin",    "Europe/Berlin (CET/CEST, UTC+1/2)"],
+					["America/New_York", "America/New_York (ET, UTC-5/4)"],
+					["America/Chicago",  "America/Chicago (CT, UTC-6/5)"],
+					["America/Denver",   "America/Denver (MT, UTC-7/6)"],
+					["America/Los_Angeles", "America/Los_Angeles (PT, UTC-8/7)"],
+					["America/Sao_Paulo", "America/Sao_Paulo (BRT, UTC-3)"],
+					["Australia/Sydney", "Australia/Sydney (AEST/AEDT, UTC+10/11)"],
+				];
+				for (const [value, label] of zones) dd.addOption(value, label);
+				dd.setValue(this.plugin.settings.dateTimezone ?? "local");
+				dd.onChange(async (v) => {
+					this.plugin.settings.dateTimezone = v;
 					await this.plugin.saveSettings();
 				});
 			});

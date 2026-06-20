@@ -53,6 +53,7 @@ export interface FileManagerContext {
 	mappings: FieldMapping[];
 	nullFieldBehavior: NullFieldBehavior;
 	noMarkerBehavior: NoMarkerBehavior;
+	dateTimezone: string;
 }
 
 export class FileManager {
@@ -204,6 +205,7 @@ function toBuildCtx(ctx: FileManagerContext) {
 		syncedAt: ctx.syncedAt,
 		mappings: ctx.mappings,
 		nullFieldBehavior: ctx.nullFieldBehavior,
+		dateTimezone: ctx.dateTimezone,
 	};
 }
 
