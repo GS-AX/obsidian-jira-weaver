@@ -1,7 +1,7 @@
 {
   "id": "jira-weaver",
   "name": "Jira Weaver",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "minAppVersion": "1.8.7",
   "description": "Sync Jira issues into your vault and weave them into your knowledge graph via wiki-links, Frontmatter, and Dataview.",
   "author": "GS-AX",
