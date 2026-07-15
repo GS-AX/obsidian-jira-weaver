@@ -42,7 +42,20 @@ export interface SearchParams {
 	maxResults: number;
 	fields?: string[];
 	startAt?: number;
+	nextPageToken?: string;
 }
+
+/**
+ * Server-side page caps:
+ *  - Jira Cloud /rest/api/3/search/jql hard-caps maxResults at ~100 per call.
+ *  - Jira DC /rest/api/2/search is bounded by `jira.search.views.default.max`
+ *    (commonly 100 or 1000); 100 is the safe lowest common denominator.
+ */
+const SEARCH_PAGE_SIZE = 100;
+
+/** Hard upper bound on pagination iterations to guard against a server
+ *  that keeps returning a fresh nextPageToken indefinitely. */
+const SEARCH_PAGE_LIMIT = 1000;
 
 /**
  * Default field set requested from /search for v0.1.0. Field-mapping aware
@@ -164,23 +177,79 @@ export class JiraClient {
 
 	/** Bulk issue fetch by JQL.
 	 *  Cloud (Basic auth): GET /rest/api/3/search/jql — avoids Electron XSRF check on POST.
-	 *  DC/Server (Bearer): POST /rest/api/2/search — v3 endpoint may not exist on older DC. */
+	 *  DC/Server (Bearer): GET /rest/api/2/search — v3 endpoint may not exist on older DC.
+	 *
+	 *  Pagination is transparent to callers: requests pages until either the
+	 *  caller-supplied `maxResults` cap is reached or the server signals the
+	 *  end of results. The returned shape stays `{ issues }` so call sites
+	 *  don't need to change. */
 	async searchIssues(params: SearchParams): Promise<JiraSearchResponse> {
 		this.requireConfig();
-		if (this.cfg.authMode === "basic") {
-			return this.searchCloud(params);
+		const cap = Math.max(0, params.maxResults | 0);
+		const isCloud = this.cfg.authMode === "basic";
+		const collected: JiraIssue[] = [];
+
+		let nextPageToken: string | undefined;
+		let startAt = 0;
+		let lastTotal: number | undefined;
+		let lastIsLast: boolean | undefined;
+
+		for (let iteration = 0; iteration < SEARCH_PAGE_LIMIT; iteration++) {
+			const remaining = cap - collected.length;
+			if (remaining <= 0) break;
+			const pageSize = Math.min(SEARCH_PAGE_SIZE, remaining);
+
+			const page = isCloud
+				? await this.searchCloud({
+						...params,
+						maxResults: pageSize,
+						nextPageToken,
+					})
+				: await this.searchDC({
+						...params,
+						maxResults: pageSize,
+						startAt,
+					});
+
+			const pageIssues = page.issues ?? [];
+			if (pageIssues.length === 0) break;
+
+			collected.push(...pageIssues);
+
+			lastTotal = page.total ?? lastTotal;
+			lastIsLast = page.isLast;
+
+			if (isCloud) {
+				nextPageToken = page.nextPageToken;
+				if (!nextPageToken) break;
+				if (page.isLast === true) break;
+			} else {
+				if (pageIssues.length < pageSize) break;
+				startAt += pageIssues.length;
+				if (typeof page.total === "number" && startAt >= page.total) break;
+			}
 		}
-		return this.searchDC(params);
+
+		const issues = collected.length > cap ? collected.slice(0, cap) : collected;
+		return {
+			issues,
+			total: lastTotal,
+			isLast: lastIsLast,
+		};
 	}
 
 	private searchCloud(params: SearchParams): Promise<JiraSearchResponse> {
 		const fields = (params.fields ?? DEFAULT_FIELDS).join(",");
+		// /rest/api/3/search/jql ignores startAt and paginates with an
+		// opaque nextPageToken cursor — only send the token when present.
 		const qs = new URLSearchParams({
 			jql: params.jql,
 			maxResults: String(params.maxResults),
-			startAt: String(params.startAt ?? 0),
 			fields,
 		});
+		if (params.nextPageToken) {
+			qs.set("nextPageToken", params.nextPageToken);
+		}
 		return this.request<JiraSearchResponse>({
 			url: `${this.baseUrl()}/rest/api/3/search/jql?${qs.toString()}`,
 			method: "GET",

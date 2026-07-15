@@ -344,9 +344,13 @@ export interface JiraIssue {
 
 export interface JiraSearchResponse {
 	issues: JiraIssue[];
+	// Classic /search (DC/Server): startAt + total. Cloud /search/jql no
+	// longer returns total and uses nextPageToken instead.
 	total?: number;
 	startAt?: number;
 	maxResults?: number;
+	nextPageToken?: string;
+	isLast?: boolean;
 }
 
 /* -------------------------------------------------------------------------- */
